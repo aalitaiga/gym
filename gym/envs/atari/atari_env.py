@@ -33,7 +33,6 @@ class AtariEnv(gym.Env, utils.EzPickle):
         if not os.path.exists(self.game_path):
             raise IOError('You asked for game %s but path %s does not exist'%(game, self.game_path))
         self._obs_type = obs_type
-        self.frameskip = frameskip
         self.ale = atari_py.ALEInterface()
         self.viewer = None
 
@@ -41,6 +40,12 @@ class AtariEnv(gym.Env, utils.EzPickle):
         # https://github.com/openai/gym/issues/349
         assert isinstance(repeat_action_probability, (float, int)), "Invalid repeat_action_probability: {!r}".format(repeat_action_probability)
         self.ale.setFloat('repeat_action_probability'.encode('utf-8'), repeat_action_probability)
+
+        if isinstance(frameskip, int):
+            self.ale.setInt("frame_skip", frameskip)
+            self.frameskip = 1
+        else:
+            self.frameskip = frameskip
 
         self._seed()
 
