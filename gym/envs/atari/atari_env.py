@@ -28,7 +28,6 @@ class AtariEnv(gym.Env, utils.EzPickle):
 
         utils.EzPickle.__init__(self, game, obs_type)
         assert obs_type in ('ram', 'image')
-
         self.game_path = atari_py.get_game_path(game)
         if not os.path.exists(self.game_path):
             raise IOError('You asked for game %s but path %s does not exist'%(game, self.game_path))
@@ -42,13 +41,13 @@ class AtariEnv(gym.Env, utils.EzPickle):
         self.ale.setFloat('repeat_action_probability'.encode('utf-8'), repeat_action_probability)
 
         if isinstance(frameskip, int):
-            self.ale.setInt("frame_skip", frameskip)
+            self.ale.setInt(b"frame_skip", frameskip)
             self.frameskip = 1
         else:
             self.frameskip = frameskip
 
         self._seed()
-
+        assert self.ale.getInt(b"frame_skip") == 4
         (screen_width, screen_height) = self.ale.getScreenDims()
 
         self._action_set = self.ale.getMinimalActionSet()
